@@ -79,22 +79,22 @@ export function CreateApiClientForm() {
               />
             </div>
 
-            <div className="grid w-full items-center gap-1.5">
-              <Label htmlFor="app_type">Application Type</Label>
-              <Select defaultValue="regular_web" name="app_type">
-                <SelectTrigger id="app_type">
-                  <SelectValue placeholder="Select an application type" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="native">Native</SelectItem>
-                  <SelectItem value="spa">Single Page App</SelectItem>
-                  <SelectItem value="regular_web">Regular Web App</SelectItem>
-                  <SelectItem value="non_interactive">
-                    Non Interactive
-                  </SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+            {/*<div className="grid w-full items-center gap-1.5">*/}
+            {/*  <Label htmlFor="app_type">Application Type</Label>*/}
+            {/*  <Select defaultValue="regular_web" name="app_type">*/}
+            {/*    <SelectTrigger id="app_type">*/}
+            {/*      <SelectValue placeholder="Select an application type" />*/}
+            {/*    </SelectTrigger>*/}
+            {/*    <SelectContent>*/}
+            {/*      <SelectItem value="native">Native</SelectItem>*/}
+            {/*      <SelectItem value="spa">Single Page App</SelectItem>*/}
+            {/*      <SelectItem value="regular_web">Regular Web App</SelectItem>*/}
+            {/*      <SelectItem value="non_interactive">*/}
+            {/*        Non Interactive*/}
+            {/*      </SelectItem>*/}
+            {/*    </SelectContent>*/}
+            {/*  </Select>*/}
+            {/*</div>*/}
           </div>
         </CardContent>
         <CardFooter className="flex justify-end">
