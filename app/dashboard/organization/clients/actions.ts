@@ -3,7 +3,7 @@
 import {revalidatePath} from "next/cache"
 import {Session} from "@auth0/nextjs-auth0"
 
-import {managementClient, onboardingClient} from "@/lib/auth0"
+import {managementClient} from "@/lib/auth0"
 import {Client} from "@/lib/clients"
 import {withServerActionAuth} from "@/lib/with-server-action-auth"
 
@@ -17,41 +17,44 @@ export interface CreateApiClientSuccess {
 }
 
 export const createApiClient = withServerActionAuth(
-    async function createApiClient(formData: FormData, _: Session) {
+    async function createApiClient(formData: FormData, session: Session) {
         const name = formData.get("name") as Client["name"]
-        const app_type = "non_interactive" as Client["app_type"]
-
         if (!name) {
             return {
                 error: "Client name is required.",
             } as CreateApiClientError
         }
 
-        if (!app_type) {
-            return {
-                error: "Application type is required.",
-            } as CreateApiClientError
-        }
-
         try {
 
+            // 1️⃣  Create new M2M client
             const {data: newClient} = await managementClient.clients.create({
                 name,
-                app_type,
+                app_type: "non_interactive",
                 is_first_party: true,
                 organization_usage: "require",
             })
 
-            // 2️⃣  Enable it ONLY for the target organisation – no other orgs can use it
-            onboardingClient
+            // 2️⃣ Update the default organization of the client
+            await managementClient.clients.update({
+                client_id: newClient.client_id,
+            }, {
+                default_organization: {
+                    organization_id: session.user.org_id,
+                    flows: ["client_credentials"]
+                }
+            })
+
+
+            // 3️⃣  Create a new client grant for the client for the user organisation – no other orgs can use it
+            //
             await managementClient.clientGrants.create(
                 {
                     client_id: newClient.client_id,
-                    audience: process.env.NEXT_PUBLIC_AUTH0_AUDIENCE,
-                    scope: ["read:current_user"],
+                    audience: process.env.AUTH0_API_AUDIENCE,
+                    scope: ["read:messages"], // TODO - pass scopes
                 }
             )
-
 
             revalidatePath("/dashboard/organization/api-clients")
             return {
