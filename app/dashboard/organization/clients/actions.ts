@@ -48,13 +48,19 @@ export const createApiClient = withServerActionAuth(
 
             // 3️⃣  Create a new client grant for the client for the user organisation – no other orgs can use it
             //
-            await managementClient.clientGrants.create(
+            const {data: grant} = await managementClient.clientGrants.create(
                 {
                     client_id: newClient.client_id,
                     audience: process.env.AUTH0_API_AUDIENCE,
                     scope: ["read:messages"], // TODO - pass scopes
+                    organization_usage: "require"
                 }
             )
+            /* ── 4️⃣  Associate the grant with *this* organisation ─────── */
+            await managementClient.organizations.postOrganizationClientGrants(
+                {id: session.user.org_id},                        // path param
+                {grant_id: grant.id}    // body
+            );
 
             revalidatePath("/dashboard/organization/api-clients")
             return {
